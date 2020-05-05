@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  ec2-management
+
+  Sample SAM Template for ec2-management
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  StartServer:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: ./
+      Handler: start.start
+      Runtime: python3.7
+      FunctionName: start-ec2
+      Policies:
+        Statement:
+          Effect: Allow
+          Action:
+            - ec2:StartInstances
+            - ec2:StopInstances
+            - ec2:DescribeInstances
+          Resource: "*"
+  StopServer:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: ./
+      Handler: stop.stop
+      Runtime: python3.7
+      FunctionName: stop-ec2
+      Policies:
+        Statement:
+          Effect: Allow
+          Action:
+            - ec2:StartInstances
+            - ec2:StopInstances
+            - ec2:DescribeInstances
+          Resource: "*"
+  DescribeServer:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: ./
+      Handler: describe.describe
+      Runtime: python3.7
+      FunctionName: describe-ec2
+      Policies:
+        Statement:
+          Effect: Allow
+          Action:
+            - ec2:DescribeInstances
+          Resource: "*"
+
+
+
