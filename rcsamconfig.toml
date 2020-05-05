@@ -1,0 +1,9 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "rc-ec2-management"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1hgygstkcp9q2"
+s3_prefix = "rc-ec2-management"
+region = "us-east-2"
+capabilities = "CAPABILITY_IAM"

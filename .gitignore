@@ -2,3 +2,6 @@
 /.vscode/*
 /.aws-sam/*
 /.creds/*
+
+*/__pycache__/*
+/cli/server.py

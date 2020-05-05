@@ -29,15 +29,15 @@ def stop(event, context):
                 rv_message['message'] = f"Stopping instance {server['name']}"
                 rv_message['success'] = True
             except:
-                rv_message['message'] = f"Could not stop instance {server['name']}"
+                rv_message['message'] = f"There was a problem stopping {server['name']}"
         if instance.state['Code'] == 32:
-            rv_message['message'] = f"Instance {server['name']} is shutting-down"
+            rv_message['message'] = f"{server['name']} is shutting-down"
         if instance.state['Code'] == 48:
-            rv_message['message'] = f"Instance {server['name']} is terminated"
+            rv_message['message'] = f"{server['name']} is terminated"
         if instance.state['Code'] == 64:
-            rv_message['message'] = f"Instance {server['name']} is stopping"
+            rv_message['message'] = f"{server['name']} is stopping"
         if instance.state['Code'] == 80:
-            rv_message['message'] = f"Instance {server['name']} stopped"
+            rv_message['message'] = f"{server['name']} is stopped"
 
         print(rv_message)
         rv.append(rv_message)       

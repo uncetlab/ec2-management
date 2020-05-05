@@ -2,17 +2,9 @@ import os
 import boto3
 import json
 import argparse
-from enum import Enum
-
-
-class Org(Enum):
-    RC=1
-    KFNEXT=2
-    REESELAB=3
+from server import Org, SERVERS
 
 CREDENTIALFOLDER='.creds'
-ORGS = [Org.KFNEXT, Org.RC, Org.REESELAB]
-
 
 def getCredentialLocation(org):
     if not isinstance(org,Org):
@@ -60,34 +52,81 @@ def loadCredentials(org):
 
     return credentials
 
+
 def ls(args):
-    for org in ORGS:
-        rv = loadCredentials(org)
-        if not rv:
-            print(f"You do not have creds for {org}")
-        else:
-            print(rv)
+    if args.server:
+        print("hello")
+
+    for name in SERVERS:
+        data = {}
+        data['servers'] = SERVERS[name]['servers'] 
+        
+        creds = loadCredentials(SERVERS[name]['org'])
+        
+        lambda_client = boto3.client(
+            "lambda",
+            aws_access_key_id=creds['access_key'],
+            aws_secret_access_key=creds['secret_key'],
+            region_name=creds['region']
+        )
+
+        rv = lambda_client.invoke(
+            FunctionName="describe-ec2",
+            Payload=json.dumps(data)
+        )
+
+        outcome = json.load(rv['Payload'])
+
+        for server_result in outcome['messages']:
+            print(f"{server_result['name']}: {server_result['message']}")    
 
 
-def stop(args):
-    rv = loadCredentials(Org.KFNEXT)
+def updateServer(args):
+    if args.server is None:
+        print("Need to provide the server to stop")
+        return
+
+    if not args.server in SERVERS:
+        print(f"{args.server} is not one of our managed servers")
+        return
+
+    data = {}
+    data['servers'] = SERVERS[args.server]['servers'] 
+    creds = loadCredentials(SERVERS[args.server]['org'])
+    
+    if not creds:
+        #Problem when loading credentials let it handle error message
+        return
+
     lambda_client = boto3.client(
         "lambda",
-        aws_access_key_id=rv['access_key'],
-        aws_secret_access_key=rv['secret_key'],
-        region_name=rv['region']
+        aws_access_key_id=creds['access_key'],
+        aws_secret_access_key=creds['secret_key'],
+        region_name=creds['region']
     )
 
-    with open(os.path.join("./","demo","demo.json")) as fh:
-        data = json.load(fh)
+    if args.command == "stop":
+        func="stop-ec2"
+        verb="stop"
+    elif args.command == "start":
+        func="start-ec2"
+        verb="start"
+    else:
+        print("command was not 'start' or 'stop'")
+        return
 
-    rv2 = lambda_client.invoke(
-        FunctionName="stop-ec2",
+    rv = lambda_client.invoke(
+        FunctionName=func,
         Payload=json.dumps(data)
     )
 
-    print(json.load(rv2['Payload']))
-
+    outcome = json.load(rv['Payload'])
+    
+    for server_result in outcome['messages']:
+        if server_result['success']:
+            print(f"{verb.capitalize()}{verb[-1]}ing server {server_result['name']}. This will take time to complete. Use the 'ls' command to check on the status of the server")
+        else:
+            print(f"Could not {verb} {server_result['name']} because {server_result['message']}")
 
 def main():
     parser = argparse.ArgumentParser(description="Manage the Reese Inovation and KF Next EC2 Instances")
@@ -95,12 +134,11 @@ def main():
     parser.add_argument('--server', type=str, help="name of the server")
 
     args = parser.parse_args()
-    #print(args)
-    #print(args.command)
+
     if args.command == "ls":
         ls(args)
-    elif args.command == 'stop':
-        stop(args)
+    elif args.command == 'stop' or args.command == 'start':
+        updateServer(args)
 
 
 if __name__=='__main__':
