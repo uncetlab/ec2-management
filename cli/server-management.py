@@ -73,6 +73,7 @@ def ls(args):
     table.add_column("Project")
     table.add_column("Server")
     table.add_column("Status")
+    table.add_column("Public IP")
     
     for name in servers:
         data = {}
@@ -95,7 +96,13 @@ def ls(args):
         outcome = json.load(rv['Payload'])
 
         for server_result in outcome['messages']:
-            table.add_row(name, server_result['name'], server_result['message'])
+            ip = ""
+            if not 'public_ip' in server_result:
+                ip ="*"
+            else:
+                ip = server_result['public_ip']
+
+            table.add_row(name, server_result['name'], server_result['message'], ip)
 
     console.print(table)    
 

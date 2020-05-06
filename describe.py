@@ -25,6 +25,9 @@ def describe(event, context):
             rv_message['message'] = f"{server['name']} is pending"
         if instance.state['Code'] == 16:  
             rv_message['message'] = f"{server['name']} is running"
+            extra_info = boto3.client('ec2').describe_instances(InstanceIds=[server['id']])
+            public_ip = extra_info["Reservations"][0]["Instances"][0]["NetworkInterfaces"][0]["Association"]["PublicIp"]
+            rv_message['public_ip'] = public_ip
         if instance.state['Code'] == 32:
             rv_message['message'] = f"{server['name']} is shutting-down"
         if instance.state['Code'] == 48:
@@ -41,4 +44,3 @@ def describe(event, context):
     return {
         "messages": rv,
     }
-
