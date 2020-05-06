@@ -3,8 +3,11 @@ import boto3
 import json
 import argparse
 from server import Org, SERVERS
+from rich.table import Column, Table
+from rich.console import Console
 
 CREDENTIALFOLDER='.creds'
+console = Console()
 
 def getCredentialLocation(org):
     if not isinstance(org,Org):
@@ -54,14 +57,28 @@ def loadCredentials(org):
 
 
 def ls(args):
-    if args.server:
-        print("hello")
+    servers = SERVERS
 
-    for name in SERVERS:
+    if args.server:
+        if not args.server in SERVERS:
+            print(f"No servers named {args.server}")
+            return
+        else:
+            #make the servers variable only contain a single server
+            servers = {}
+            servers[args.server] = SERVERS[args.server]
+
+
+    table = Table(show_header=True, header_style="bold blue")
+    table.add_column("Project")
+    table.add_column("Server")
+    table.add_column("Status")
+    
+    for name in servers:
         data = {}
-        data['servers'] = SERVERS[name]['servers'] 
+        data['servers'] = servers[name]['servers'] 
         
-        creds = loadCredentials(SERVERS[name]['org'])
+        creds = loadCredentials(servers[name]['org'])
         
         lambda_client = boto3.client(
             "lambda",
@@ -78,7 +95,9 @@ def ls(args):
         outcome = json.load(rv['Payload'])
 
         for server_result in outcome['messages']:
-            print(f"{server_result['name']}: {server_result['message']}")    
+            table.add_row(name, server_result['name'], server_result['message'])
+
+    console.print(table)    
 
 
 def updateServer(args):
@@ -121,7 +140,7 @@ def updateServer(args):
     )
 
     outcome = json.load(rv['Payload'])
-    
+
     for server_result in outcome['messages']:
         if server_result['success']:
             print(f"{verb.capitalize()}{verb[-1]}ing server {server_result['name']}. This will take time to complete. Use the 'ls' command to check on the status of the server")
@@ -142,5 +161,4 @@ def main():
 
 
 if __name__=='__main__':
-    
     main()
