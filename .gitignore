@@ -1,6 +1,7 @@
 /.venv/*
 /.vscode/*
 /.aws-sam/*
+infra/.aws-sam/*
 /.creds/*
 
 */__pycache__/*
