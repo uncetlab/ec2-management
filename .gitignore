@@ -4,5 +4,7 @@
 infra/.aws-sam/*
 /.creds/*
 
+*.toml
+
 */__pycache__/*
 /cli/server.py
