@@ -16,7 +16,7 @@ This repo contains the Infrastructure as Code (SAM) for deploying lambda functio
 
 
 # Build and deploy the lambda functions
-Make sure your current AWS credentials are set to the account you want to deploy to. You then need to rename the .toml file for the evnironment you want to deploy to samconfig.toml. Setting the aws credentials for the RC environment is a pain so do it first then start a competely new terminal to switch to other credentials.
+Make sure your current AWS credentials are set to the account you want to deploy to. You then need to rename the .toml file for the environment you want to deploy to samconfig.toml. Setting the aws credentials for the RC environment is a pain so do it first then start a competely new terminal to switch to other credentials.
 ```
 mv <org.toml> samconfig.toml
 
