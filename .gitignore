@@ -7,4 +7,4 @@ infra/.aws-sam/*
 *.toml
 
 */__pycache__/*
-/cli/server.py
+

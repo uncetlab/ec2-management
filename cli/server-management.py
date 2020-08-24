@@ -21,7 +21,7 @@ def getCredentialLocation(org):
     elif org == Org.KFNEXT:
         credentialLocation = os.path.join(credentialLocation, "kf.json")
     elif org == Org.REESELAB:
-        credentialLocation = os.path.join(credentialLocation, "reese.json")
+        credentialLocation = os.path.join(credentialLocation, "rl.json")
     
     return credentialLocation
 
@@ -94,7 +94,7 @@ def ls(args):
         )
 
         outcome = json.load(rv['Payload'])
-
+        
         for server_result in outcome['messages']:
             ip = ""
             if not 'public_ip' in server_result:
